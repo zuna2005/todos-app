@@ -7,13 +7,13 @@ A simple and responsive TODOs application built with React, featuring authentica
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/todos-app.git
+git clone https://github.com/zuna2005/todos-app.git
 cd todos-app
 
 # 2. Install dependencies
 npm install
 
 # 3. Start the development server
-npm start
+npm run dev
 ```
 
