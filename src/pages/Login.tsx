@@ -2,11 +2,15 @@ import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
-import { login } from "../api/login";
+import { login } from "../api/usersApi";
+import SubmitButton from "../components/SubmitButton";
+import { useAppDispatch } from "../state-manager/hooks";
+import { setUser } from "../state-manager/userSlice";
 import type { LoginData } from "../types/types";
 
 function Login() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const {
     register,
@@ -18,6 +22,7 @@ function Login() {
     login(data)
       .then((res) => {
         navigate("/");
+        dispatch(setUser(res.data));
         console.log(res.data);
       })
       .catch((err) => {
@@ -62,21 +67,7 @@ function Login() {
         {errors.password && (
           <p className="text-danger m-0">This field is required</p>
         )}
-        <button
-          className="btn btn-primary mt-3"
-          type="submit"
-          disabled={loading}
-        >
-          {loading && (
-            <>
-              <span
-                className="spinner-border spinner-border-sm me-1"
-                aria-hidden="true"
-              ></span>
-            </>
-          )}
-          Sign in
-        </button>
+        <SubmitButton loading={loading}>Sign in</SubmitButton>
       </form>
     </div>
   );
