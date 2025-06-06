@@ -2,13 +2,17 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { checkAuth, logout } from "../api/usersApi";
-import { getTodos } from "../api/todosApi";
+import { apiAddTodo, apiGetTodos } from "../api/todosApi";
 import Add from "../assets/add.svg";
-import NewTodo from "../components/NewTodo";
 import TodoCard from "../components/TodoCard";
+import TodoCardForm from "../components/TodoCardForm";
 import { errorMessages } from "../configs/config";
 import { useAppDispatch, useAppSelector } from "../state-manager/hooks";
-import { resetUser, selectCurrentRole, setUser } from "../state-manager/userSlice";
+import {
+  resetUser,
+  selectCurrentRole,
+  setUser,
+} from "../state-manager/userSlice";
 import type { Todo } from "../types/types";
 
 function Home() {
@@ -25,7 +29,8 @@ function Home() {
     checkAuth()
       .then((res) => {
         dispatch(setUser(res.data));
-        console.log("from checkAuth", res.data)})
+        console.log("from checkAuth", res.data);
+      })
       .catch(() => {
         dispatch(resetUser());
         navigate("/login");
@@ -34,13 +39,18 @@ function Home() {
   }, [navigate, dispatch]);
 
   useEffect(() => {
-    getTodos()
+    apiGetTodos()
       .then((res) => setTodos(res.data))
       .catch((err) => console.error(err.message));
   }, []);
 
   function addTodo(newTodo: Todo) {
     setTodos([...todos, newTodo]);
+  }
+  function updateTodo(updatedTodo: Todo) {
+    setTodos((prevTodos) =>
+      prevTodos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+    );
   }
   function deleteTodo(idToDelete: number) {
     setTodos(todos.filter((todo) => todo.id !== idToDelete));
@@ -58,8 +68,7 @@ function Home() {
     <div className="position-relative min-vh-100 p-3">
       {loading && (
         <div className="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center z-3 bg-white bg-opacity-10">
-          <div className="spinner-border text-primary">
-          </div>
+          <div className="spinner-border text-primary"></div>
         </div>
       )}
       <div className="d-flex justify-content-between mb-4">
@@ -80,9 +89,21 @@ function Home() {
           </div>
         </button>
       )}
-      {editMode && <NewTodo setEditMode={setEditMode} updateTodos={addTodo} />}
+      {editMode && (
+        <TodoCardForm
+          isNew={true}
+          setEditMode={setEditMode}
+          updateTodos={addTodo}
+          onSave={apiAddTodo}
+        />
+      )}
       {todos.map((todo) => (
-        <TodoCard todo={todo} key={todo.id} onDelete={deleteTodo} />
+        <TodoCard
+          todo={todo}
+          key={todo.id}
+          onDelete={deleteTodo}
+          onUpdate={updateTodo}
+        />
       ))}
     </div>
   );

@@ -10,5 +10,6 @@ export const errorMessages: Record<number | string, string> = {
 
 export const successMessages: Record<string, string> = {
     add: "Todo added successfully!",
+    update: "Todo updated successfully!",
     delete: "Todo deleted successfully!"
 }
