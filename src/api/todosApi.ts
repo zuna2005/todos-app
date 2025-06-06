@@ -11,3 +11,7 @@ export function getTodos() {
 export function addTodo(data: NewTodoData) {
     return axios.post(API_URL + "/todos", data);
 }
+
+export function deleteTodo(id: number) {
+  return axios.delete(API_URL + `/todos/${id}`);
+}

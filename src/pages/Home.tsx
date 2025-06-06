@@ -4,14 +4,15 @@ import { toast } from "react-toastify";
 import { checkAuth, logout } from "../api/usersApi";
 import { getTodos } from "../api/todosApi";
 import Add from "../assets/add.svg";
-import Delete from "../assets/delete.svg";
-import Edit from "../assets/edit.svg";
 import NewTodo from "../components/NewTodo";
 import { useAppDispatch, useAppSelector } from "../state-manager/hooks";
-import { resetUser, selectCurrentRole } from "../state-manager/userSlice";
+import { resetUser, selectCurrentRole, setUser } from "../state-manager/userSlice";
 import type { Todo } from "../types/types";
+import TodoCard from "../components/TodoCard";
+import { errorMessages } from "../configs/config";
 
 function Home() {
+  console.log("home rerender");
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector(selectCurrentRole);
@@ -22,7 +23,9 @@ function Home() {
   useEffect(() => {
     setLoading(true);
     checkAuth()
-      .then((res) => console.log("from checkAuth", res.data))
+      .then((res) => {
+        dispatch(setUser(res.data));
+        console.log("from checkAuth", res.data)})
       .catch(() => {
         dispatch(resetUser());
         navigate("/login");
@@ -34,10 +37,13 @@ function Home() {
     getTodos()
       .then((res) => setTodos(res.data))
       .catch((err) => console.error(err.message));
-  });
+  }, []);
 
   function addTodo(newTodo: Todo) {
     setTodos([...todos, newTodo]);
+  }
+  function deleteTodo(idToDelete: number) {
+    setTodos(todos.filter((todo) => todo.id !== idToDelete));
   }
   function handleLogout() {
     logout()
@@ -45,7 +51,7 @@ function Home() {
         dispatch(resetUser());
         navigate("/login");
       })
-      .catch(() => toast.error("Error while logging out. Try again later."));
+      .catch(() => toast.error(errorMessages.logout));
   }
 
   return (
@@ -77,22 +83,7 @@ function Home() {
       )}
       {editMode && <NewTodo setEditMode={setEditMode} updateTodos={addTodo} />}
       {todos.map((todo) => (
-        <div className="card m-3 p-2" key={todo.id}>
-          <div className="card-body">
-            <div className="d-flex justify-content-between">
-              <h5 className="card-title">{todo.title}</h5>
-              {(currentUser === "admin" || currentUser === todo.createdBy) && <div>
-                <button className="btn">
-                  <img src={Edit} />
-                </button>
-                <button className="btn">
-                  <img src={Delete} />
-                </button>
-              </div>}
-            </div>
-            <p className="card-text">{todo.description}</p>
-          </div>
-        </div>
+        <TodoCard todo={todo} key={todo.id} onDelete={deleteTodo} />
       ))}
     </div>
   );

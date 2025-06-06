@@ -23,7 +23,7 @@ function NewTodo({ setEditMode, updateTodos }: NewTodoProps) {
       .then((res) => {
         setEditMode(false);
         updateTodos(res.data);
-        toast.success("Added a new todo!");
+        toast.success("Todo added successfully!");
         console.log(res.data);
       })
       .catch((err) => {
