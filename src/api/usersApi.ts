@@ -15,3 +15,7 @@ export function logout() {
 export function checkAuth() {
   return axios.get(API_URL + "/me");
 }
+
+export function getUsers() {
+  return axios.get(API_URL + "/users");
+}
