@@ -5,11 +5,11 @@ import { checkAuth, logout } from "../api/usersApi";
 import { getTodos } from "../api/todosApi";
 import Add from "../assets/add.svg";
 import NewTodo from "../components/NewTodo";
+import TodoCard from "../components/TodoCard";
+import { errorMessages } from "../configs/config";
 import { useAppDispatch, useAppSelector } from "../state-manager/hooks";
 import { resetUser, selectCurrentRole, setUser } from "../state-manager/userSlice";
 import type { Todo } from "../types/types";
-import TodoCard from "../components/TodoCard";
-import { errorMessages } from "../configs/config";
 
 function Home() {
   console.log("home rerender");
@@ -59,7 +59,6 @@ function Home() {
       {loading && (
         <div className="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center z-3 bg-white bg-opacity-10">
           <div className="spinner-border text-primary">
-            <span className="visually-hidden">Loading...</span>
           </div>
         </div>
       )}

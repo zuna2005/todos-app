@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "react-toastify";
-import SubmitButton from "./SubmitButton";
 import { addTodo } from "../api/todosApi";
-import type { NewTodoData, Todo } from "../types/types"; 
+import { errorMessages, successMessages } from "../configs/config";
+import type { NewTodoData, Todo } from "../types/types";
+import LoadingButton from "./LoadingButton";
 
 interface NewTodoProps {
-    setEditMode: (value: boolean) => void;
-    updateTodos: (newTodo: Todo) => void;
+  setEditMode: (value: boolean) => void;
+  updateTodos: (newTodo: Todo) => void;
 }
 
 function NewTodo({ setEditMode, updateTodos }: NewTodoProps) {
@@ -23,14 +24,14 @@ function NewTodo({ setEditMode, updateTodos }: NewTodoProps) {
       .then((res) => {
         setEditMode(false);
         updateTodos(res.data);
-        toast.success("Todo added successfully!");
+        toast.success(successMessages.add);
         console.log(res.data);
       })
       .catch((err) => {
         toast.error(
           err.response && err.response.status == 400
             ? err.response.data.message
-            : "Oops! Something went wrong."
+            : errorMessages.default
         );
         console.error(err);
       })
@@ -48,7 +49,7 @@ function NewTodo({ setEditMode, updateTodos }: NewTodoProps) {
           {...register("title", { required: true })}
         />
         {errors.title && (
-          <p className="text-danger m-0">This field is required</p>
+          <p className="text-danger m-0">{errorMessages.required}</p>
         )}
         <textarea
           className="form-control mt-3"
@@ -58,9 +59,11 @@ function NewTodo({ setEditMode, updateTodos }: NewTodoProps) {
           {...register("description", { required: true })}
         />
         {errors.description && (
-          <p className="text-danger m-0">This field is required</p>
+          <p className="text-danger m-0">{errorMessages.required}</p>
         )}
-        <SubmitButton loading={loading}>Save</SubmitButton>
+        <LoadingButton loading={loading} styles="btn-success mt-3">
+          Save
+        </LoadingButton>
         <button
           className="btn btn-danger mt-3 ms-2"
           disabled={loading}

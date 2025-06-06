@@ -3,7 +3,8 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { login } from "../api/usersApi";
-import SubmitButton from "../components/SubmitButton";
+import LoadingButton from "../components/LoadingButton";
+import { errorMessages } from "../configs/config";
 import { useAppDispatch } from "../state-manager/hooks";
 import { setUser } from "../state-manager/userSlice";
 import type { LoginData } from "../types/types";
@@ -29,7 +30,7 @@ function Login() {
         toast.error(
           err.response && err.response.status == 400
             ? err.response.data.message
-            : "Oops! Something went wrong."
+            : errorMessages.default
         );
         console.error(err);
       })
@@ -51,7 +52,7 @@ function Login() {
           {...register("login", { required: true })}
         />
         {errors.login && (
-          <p className="text-danger m-0">This field is required</p>
+          <p className="text-danger m-0">{errorMessages.required}</p>
         )}
         <label htmlFor="password" className="form-label mt-3">
           Password
@@ -65,9 +66,11 @@ function Login() {
           {...register("password", { required: true })}
         />
         {errors.password && (
-          <p className="text-danger m-0">This field is required</p>
+          <p className="text-danger m-0">{errorMessages.required}</p>
         )}
-        <SubmitButton loading={loading}>Sign in</SubmitButton>
+        <LoadingButton loading={loading} styles="btn-primary mt-3">
+          Sign in
+        </LoadingButton>
       </form>
     </div>
   );

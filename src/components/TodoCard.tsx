@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { deleteTodo } from "../api/todosApi";
 import Delete from "../assets/delete.svg";
 import Edit from "../assets/edit.svg";
-import { errorMessages } from "../configs/config";
+import { errorMessages, successMessages } from "../configs/config";
 import { useAppSelector } from "../state-manager/hooks";
 import { selectCurrentRole } from "../state-manager/userSlice";
 import type { Todo } from "../types/types";
@@ -24,7 +24,7 @@ function TodoCard({
     deleteTodo(todo.id)
       .then(() => {
         onDelete(todo.id);
-        toast.success("Todo deleted successfully!");
+        toast.success(successMessages.delete);
       })
       .catch((err) => {
         const status = err.response?.status;
