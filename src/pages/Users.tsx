@@ -1,51 +1,36 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { getUsers } from "../api/usersApi";
 import Header from "../components/Header";
 import { errorMessages } from "../configs/config";
-import { useAuth } from "../hooks/useAuth";
-import { useAppSelector } from "../state-manager/hooks";
+import { useAppDispatch, useAppSelector } from "../state-manager/hooks";
 import { selectCurrentRole } from "../state-manager/userSlice";
-
-interface User {
-  login: string;
-  role: string;
-  name: string;
-}
+import { getUsers, selectUsers } from "../state-manager/usersListSlice";
 
 function Users() {
-  const [users, setUsers] = useState<Array<User>>([]);
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const currentUser = useAppSelector(selectCurrentRole);
-  useAuth(setLoading);
+  const users = useAppSelector(selectUsers);
+  const hasFetched = useRef(false);
   useEffect(() => {
     if (currentUser !== "admin") {
       toast.error(errorMessages[403]);
       navigate("/");
       return;
     }
-    setLoading(true);
-    getUsers()
-      .then((res) => setUsers(res.data))
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+    dispatch(getUsers())
+    .unwrap()
       .catch((err) => {
-        const status = err.response?.status;
-        toast.error(errorMessages[status] || errorMessages.default);
-        if (status === 403) navigate("/");
-        console.error(err);
+        if (err.status === 403) navigate("/");
+        console.error(err.message);
       })
-      .finally(() => setLoading(false));
-  }, [navigate, currentUser]);
+  }, [navigate, currentUser, dispatch]);
   return (
-    <div className="m-3">
+    <div>
       <Header page="Users" />
-      <div className="position-relative">
-        {loading && (
-          <div className="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center z-3 bg-white bg-opacity-10">
-            <div className="spinner-border text-primary"></div>
-          </div>
-        )}
         <table className="table">
           <thead>
             <tr>
@@ -68,7 +53,6 @@ function Users() {
             })}
           </tbody>
         </table>
-      </div>
     </div>
   );
 }

@@ -14,3 +14,15 @@ export interface Todo {
   description: string;
   createdBy: string;
 }
+
+interface NewTodoProps {
+  isNew: true;
+  todo?: never;
+}
+
+interface EditTodoProps {
+  isNew: false;
+  todo: Todo;
+}
+
+export type TodoCardProps = NewTodoProps | EditTodoProps;

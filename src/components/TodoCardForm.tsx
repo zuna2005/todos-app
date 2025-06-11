@@ -1,37 +1,20 @@
-import type { AxiosResponse } from "axios";
-import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "react-toastify";
 import { errorMessages, successMessages } from "../configs/config";
-import type { NewTodoData, Todo } from "../types/types";
+import { useAppDispatch, useAppSelector } from "../state-manager/hooks";
+import { selectLoading } from "../state-manager/loaderSlice";
+import { addTodo, updateTodo } from "../state-manager/todosSlice";
+import type { NewTodoData, TodoCardProps } from "../types/types";
 import LoadingButton from "./LoadingButton";
 
-interface BaseProps {
+type TodoCardFormProps = TodoCardProps & {
   setEditMode: (value: boolean) => void;
-  updateTodos: (newTodo: Todo) => void;
-  onSave: (data: NewTodoData) => Promise<AxiosResponse<Todo>>;
-}
+};
 
-interface NewTodoProps extends BaseProps {
-  isNew: true;
-  todo?: never;
-}
+function TodoCardForm({ isNew, setEditMode, todo }: TodoCardFormProps) {
+  const dispatch = useAppDispatch();
+  const loading = useAppSelector(selectLoading);
 
-interface EditTodoProps extends BaseProps {
-  isNew: false;
-  todo: Todo;
-}
-
-type TodoCardFormProps = NewTodoProps | EditTodoProps;
-
-function TodoCardForm({
-  isNew,
-  setEditMode,
-  updateTodos,
-  onSave,
-  todo,
-}: TodoCardFormProps) {
-  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -43,24 +26,22 @@ function TodoCardForm({
     },
   });
   const onSubmit: SubmitHandler<NewTodoData> = (data) => {
-    setLoading(true);
-    onSave(data)
-      .then((res) => {
-        setEditMode(false);
-        const updatedTodo = isNew ? res.data : { ...todo, ...data };
-        updateTodos(updatedTodo);
-        toast.success(successMessages[isNew ? "add" : "update"]);
-      })
-      .catch((err) => {
-        const status = err.response?.status;
-        toast.error(
-          status === 400
-            ? err.response.data.message
-            : errorMessages[status] || errorMessages.default
-        );
-        console.error(err);
-      })
-      .finally(() => setLoading(false));
+    if (isNew)
+      dispatch(addTodo(data))
+        .unwrap()
+        .then(() => {
+          setEditMode(false);
+          toast.success(successMessages.add);
+        })
+        .catch((err) => toast.error(err.message));
+    else
+      dispatch(updateTodo({ id: todo.id, data }))
+        .unwrap()
+        .then(() => {
+          setEditMode(false);
+          toast.success(successMessages.update);
+        })
+        .catch((err) => toast.error(err.message));
   };
   return (
     <div className="card m-3 p-2">

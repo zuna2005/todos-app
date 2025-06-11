@@ -1,37 +1,27 @@
-import { useState } from "react";
 import { toast } from "react-toastify";
-import { apiDeleteTodo } from "../api/todosApi";
 import Delete from "../assets/delete.svg";
 import Edit from "../assets/edit.svg";
-import { errorMessages, successMessages } from "../configs/config";
-import { useAppSelector } from "../state-manager/hooks";
+import { successMessages } from "../configs/config";
+import { useAppDispatch, useAppSelector } from "../state-manager/hooks";
+import { deleteTodo } from "../state-manager/todosSlice";
 import { selectCurrentRole } from "../state-manager/userSlice";
 import type { Todo } from "../types/types";
-import LoadingButton from "./LoadingButton";
 
 interface TodoCardViewProps {
   todo: Todo;
   setEditMode: (value: boolean) => void;
-  onDelete: (id: number) => void;
 }
-function TodoCardView({ todo, setEditMode, onDelete }: TodoCardViewProps) {
-  const [loading, setLoading] = useState(false);
+function TodoCardView({ todo, setEditMode }: TodoCardViewProps) {
   const currentUser = useAppSelector(selectCurrentRole);
+  const dispatch = useAppDispatch();
 
   function handleDeleteTodo() {
-    setLoading(true);
-    apiDeleteTodo(todo.id)
+    dispatch(deleteTodo(todo.id))
+      .unwrap()
       .then(() => {
-        onDelete(todo.id);
         toast.success(successMessages.delete);
       })
-      .catch((err) => {
-        const status = err.response?.status;
-        toast.error(errorMessages[status] || errorMessages.default);
-        console.error(err);
-        if (status === 404) onDelete(todo.id);
-      })
-      .finally(() => setLoading(false));
+      .catch((err) => toast.error(err.message));
   }
   return (
     <div className="card m-3 p-2">
@@ -40,12 +30,12 @@ function TodoCardView({ todo, setEditMode, onDelete }: TodoCardViewProps) {
           <h5 className="card-title">{todo.title}</h5>
           {(currentUser === "admin" || currentUser === todo.createdBy) && (
             <div>
-              <button className="btn" disabled={loading} onClick={() => setEditMode(true)}>
+              <button className="btn" onClick={() => setEditMode(true)}>
                 <img src={Edit} />
               </button>
-              <LoadingButton loading={loading} onClick={handleDeleteTodo}>
+              <button className="btn" onClick={handleDeleteTodo}>
                 <img src={Delete} />
-              </LoadingButton>
+              </button>
             </div>
           )}
         </div>

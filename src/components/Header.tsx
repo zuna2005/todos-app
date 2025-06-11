@@ -1,21 +1,15 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import { logout } from "../api/usersApi";
 import { errorMessages } from "../configs/config";
 import { useAppDispatch, useAppSelector } from "../state-manager/hooks";
-import { resetUser, selectCurrentRole } from "../state-manager/userSlice";
+import { logout, selectCurrentRole } from "../state-manager/userSlice";
 
 function Header({ page }: { page: "Todos" | "Users" }) {
   const currentUser = useAppSelector(selectCurrentRole);
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   function handleLogout() {
-    logout()
-      .then(() => {
-        dispatch(resetUser());
-        navigate("/login");
-      })
+    dispatch(logout())
       .catch(() => toast.error(errorMessages.logout));
   }
   return (

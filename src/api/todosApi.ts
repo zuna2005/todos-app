@@ -2,8 +2,6 @@ import axios from "axios";
 import { API_URL } from "../configs/config";
 import type { NewTodoData } from "../types/types";
 
-axios.defaults.withCredentials = true;
-
 export function apiGetTodos() {
   return axios.get(API_URL + "/todos");
 }
