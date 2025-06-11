@@ -2,7 +2,6 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   apiAddTodo,
   apiDeleteTodo,
-  //  apiGetTodo,
   apiGetTodos,
   apiUpdateTodo,
 } from "../api/todosApi";
@@ -95,3 +94,4 @@ export const todosSlice = createSlice({
 export default todosSlice.reducer;
 
 export const selectTodos = (state: RootState) => state.todos.list;
+export const selectMyTodos = (state: RootState) => state.todos.list.filter(todo => todo.createdBy === state.user.info.role);
