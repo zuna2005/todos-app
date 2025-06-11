@@ -1,4 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
+import { authMiddleware } from "../middleware/authMiddleware";
 import loaderReducer from "./loaderSlice";
 import todosReducer from "./todosSlice";
 import userReducer from "./userSlice";
@@ -11,7 +12,8 @@ const store = configureStore({
     loader: loaderReducer,
     users: usersListReducer
   },
-  
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(authMiddleware),
 });
 
 export default store;
