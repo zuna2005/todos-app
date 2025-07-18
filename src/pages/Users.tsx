@@ -25,7 +25,7 @@ function Users() {
     .unwrap()
       .catch((err) => {
         if (err.status === 403) navigate("/");
-        console.error(err.message);
+        toast.error(err.message);
       })
   }, [navigate, currentUser, dispatch]);
   return (

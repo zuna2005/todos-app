@@ -10,6 +10,7 @@ function Header({ page }: { page: "Todos" | "Users" }) {
 
   function handleLogout() {
     dispatch(logout())
+      .unwrap()
       .catch(() => toast.error(errorMessages.logout));
   }
   return (
